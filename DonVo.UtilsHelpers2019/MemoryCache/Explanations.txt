@@ -1,0 +1,89 @@
+﻿Introduction
+
+This article introduces implementation of caching with the C# language, before starting the discussion about code and the implementation of caching, I would like to explain about Caches and Caching.
+
+Caches
+
+A cache is the most valuable feature that Microsoft provides. It is a type of memory that is relatively small but can be accessed very quickly. It essentially stores information that is likely to be used again. For example, web browsers typically use a cache to make web pages load faster by storing a copy of the webpage files locally, such as on your local computer.
+
+Caching
+
+Caching is the process of storing data into cache. Caching with the C# language is very easy. System.Runtime.Caching.dll provides the feature for working with caching in C#. In this illustration I am using the following classes: 
+ObjectCache
+MomoryCache
+CacheItemPolicy
+ObjectCache: The CacheItem class provides a logical representation of a cache entry, that can include regions using the RegionName property. It exists in the System.Runtime.Caching.
+
+MomoryCache: This class also comes under System.Runtime.Caching and it represents the type that implements an in-cache memory.
+
+CacheItemPolicy: Represents a set of eviction and expiration details for a specific cache entry.
+
+Code Work: Storying information into a cache.
+
+In this illustration I have kept some stock items in the cache memory for further use that is to understand the availability of a stock item in the future. When the application does not find any cached data in cache memory, it will redirect to the Get default stock function. The following code is for storing information into cache memory.
+
+private const string CacheKey = "availableStocks";    
+CacheItemPolicy cacheItemPolicy = new CacheItemPolicy();    
+cacheItemPolicy.AbsoluteExpiration = DateTime.Now.AddHours(1.0);    
+cache.Add(CacheKey, availableStocks, cacheItemPolicy);    
+Code above the line number 02 tells the system to create a policy for storing information in the cache, Line 03 specifies which policy to use. There are the following two types of policies available in the cashitempolicy class.
+AbsoluteExpiration: Indicating whether sliding expiration is enabled.
+SlidingExpiration: Policy specifies when a cache entry should be evicted after a specified duration.
+I have given one hour duration to expire cache memory and line number 04 stores information with a unique key and cache policy. The Add() method stores information into memory and the Add() method is three types based its parameter. They are as in the following:
+Add(CacheItem Item,CacheItemPolicy policy)
+Add(string key,object value,CacheItemPolicy policy, string retionname)
+Add(string key,object value,DateTimeOffset absoluteExpiration, string retionname)
+CacheKey is my unique key by which I can query in the future. The CacheItem class represents an individual cache entry in the cache, in other words this class has a structure to store information such as Region name, Key and value to store in memory. absoluteExpiration is like a time duration for expiring or releasing cached information.
+
+Retrieve Information from Cache
+
+Getting or querying information from cache memory is as easy as storing into memory. The Get function of the ObjectCache class helps to retrieve information from cache memory. This Get() method takes two parameters for querying data from cache memory. Key and region name. See the following code that helps to retrieve information from memory.
+
+Code
+ObjectCache cache = MemoryCache.Default;    
+Enumerable information=(IEnumerable)cache.Get(CacheKey);   
+Illustrated Code
+namespace CachingWithConsoleApplication    
+{    
+    class Program    
+    {    
+        static void Main(string[] args)    
+        {    
+            StockItems PS = new StockItems();    
+            List<string> Pizzas= (List<string>)  PS.GetAvailableStocks();    
+            Pizzas = (List<string>)PS.GetAvailableStocks();    
+        }    
+    }    
+    
+    public class StockItems    
+    {    
+        private const string CacheKey = "availableStocks";    
+    
+        public IEnumerable GetAvailableStocks()    
+        {    
+            ObjectCache cache = MemoryCache.Default;    
+    
+            if (cache.Contains(CacheKey))    
+                return (IEnumerable)cache.Get(CacheKey);    
+            else    
+            {    
+                IEnumerable availableStocks = this.GetDefaultStocks();    
+    
+                // Store data in the cache    
+                CacheItemPolicy cacheItemPolicy = new CacheItemPolicy();    
+                cacheItemPolicy.AbsoluteExpiration = DateTime.Now.AddHours(1.0);    
+                cache.Add(CacheKey, availableStocks, cacheItemPolicy);    
+    
+                return availableStocks;    
+            }    
+        }    
+        public IEnumerable GetDefaultStocks()    
+        {    
+            return new List<string>() { "Pen", "Pencil", "Eraser" };    
+        }    
+    }    
+    
+}  
+Summary
+
+In the preceding discussion we came to understand how information can be stored in system memory using caching.
