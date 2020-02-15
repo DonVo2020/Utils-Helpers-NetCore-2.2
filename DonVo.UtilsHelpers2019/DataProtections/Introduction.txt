@@ -1,0 +1,1 @@
+﻿https://github.com/jbogard/Docs/tree/master/aspnetcore/security/data-protection
