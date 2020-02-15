@@ -1,0 +1,5 @@
+﻿{
+  "ConnectionString": "Server=LAPTOP-ILQS92OM\\SQLEXPRESS;Database=DapperDB;Trusted_Connection=True;",
+  "SchemaName": "dbo",
+  "TableName": "TestCache"
+}
